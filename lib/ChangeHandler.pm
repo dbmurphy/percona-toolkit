@@ -462,7 +462,8 @@ sub get_changes {
 
 
 # Sub: sort_cols
-#   Sort a row's columns based on their real order in the table.
+#   Sort a row's columns based on their real order in the table, and remove
+#   generated columns.
 #   This requires that the optional tbl_struct arg was passed to <new()>.
 #   If not, the rows are sorted alphabetically.
 #
@@ -476,6 +477,7 @@ sub sort_cols {
    my @cols;
    if ( $self->{tbl_struct} ) {
       my $pos = $self->{tbl_struct}->{col_posn};
+      my $is_generated = $self->{tbl_struct}->{is_generated};
       my @not_in_tbl;
       @cols = sort {
             $pos->{$a} <=> $pos->{$b}
@@ -488,6 +490,9 @@ sub sort_cols {
             else {
                1;
             }
+         }
+         grep {
+            !$is_generated->{$_}
          }
          sort keys %$row;
       push @cols, @not_in_tbl if @not_in_tbl;
