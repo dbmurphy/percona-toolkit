@@ -74,6 +74,8 @@ like(
    "PT-1256 Set the correct charset"
 );
 
+$sb->wait_for_replicas();
+
 SKIP: {
    my $vp = VersionParser->new($source_dbh);
    if ($vp->cmp('8.0') > -1 && $vp->cmp('8.0.14') < 0 && $vp->flavor() !~ m/maria/i) {
@@ -91,6 +93,8 @@ SKIP: {
     $output = `$trunk/bin/pt-table-sync --execute --lock-and-rename h=127.1,P=12345,u=msandbox,p=msandbox,D=test,t=t1 t=t2 2>&1`;
     $output = `/tmp/12345/use -e 'show create table test.t2'`;
     like($output, qr/COMMENT='test1'/, '--lock-and-rename worked');
+
+    $sb->wait_for_replicas();
     
     #4
     $row = $replica1_dbh->selectrow_hashref("SELECT f2 FROM test.t2 WHERE id = 1");
