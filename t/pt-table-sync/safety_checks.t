@@ -146,9 +146,8 @@ like(
 
 $replica1_dbh->do("STOP ${replica_name}");
 $replica1_dbh->do("CHANGE ${source_change} TO ${source_name}_port=12345, ${source_name}_user='msandbox'");
-$replica1_dbh->do("START ${replica_name}");
-$replica1_dbh->do("STOP ${replica_name}");
-$replica1_dbh->do("CHANGE ${source_change} TO ${source_name}_port=12345, ${source_name}_user='msandbox'");
+$source_dbh->do("RESET ${source_reset}");
+$replica1_dbh->do("RESET ${replica_name}");
 $replica1_dbh->do("START ${replica_name}");
 
 # #############################################################################

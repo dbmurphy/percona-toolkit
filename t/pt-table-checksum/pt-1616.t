@@ -12,7 +12,7 @@ use English qw(-no_match_vars);
 use Test::More;
 
 #if ( !$ENV{SLOW_TESTS} ) { 
-#   plan skip_all => "pt-table-checksum/replication_filters.t is one of the top slowest files; set SLOW_TESTS=1 to enable it.";
+#   plan skip_all => "pt-table-checksum/pt-1616.t is one of the top slowest files; set SLOW_TESTS=1 to enable it.";
 #}
 
 use PerconaTest;
@@ -105,6 +105,5 @@ unlike(
 # Done.
 # #############################################################################
 $sb->wipe_clean($dbh);
-$sb->wait_for_replicas();
 ok($sb->ok(), "Sandbox servers") or BAIL_OUT(__FILE__ . " broke the sandbox");
 exit;
