@@ -18,6 +18,7 @@ import (
 	shellwords "github.com/mattn/go-shellwords"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/crypto/hkdf"
 
 	"github.com/percona/percona-toolkit/src/go/pt-secure-collect/sanitize"
 	"github.com/percona/percona-toolkit/src/go/pt-secure-collect/sanitize/util"
@@ -49,10 +50,15 @@ func collectData(opts *cliOptions) error {
 	}
 
 	if !*opts.NoEncrypt && *opts.EncryptPassword != "" {
-		password := sha256.Sum256([]byte(*opts.EncryptPassword))
+		hkdf := hkdf.New(sha256.New, []byte(*opts.EncryptPassword), salt[:], hkdfInfo)
+		key := make([]byte, 32)
+		if _, err := io.ReadFull(hkdf, key); err != nil {
+			return errors.Wrap(err, "Cannot derive key from password")
+		}
+
 		encryptedFile := tarFile + ".aes"
 		log.Infof("Encrypting %q file into %q", tarFile, encryptedFile)
-		encrypt(tarFile, encryptedFile, password)
+		encrypt(tarFile, encryptedFile, key)
 	}
 
 	return nil
