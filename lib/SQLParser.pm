@@ -59,7 +59,7 @@ my $unquoted_ident = qr/
 my $ident_alias = qr/
   \s+                                 # space before alias
   (?:(AS)\s+)?                        # optional AS keyword
-  ((?>$quoted_ident|$unquoted_ident)) # alais
+  ((?>$quoted_ident|$unquoted_ident)) # alias
 /xi;
 
 # A table is identified by 1 or 2 identifiers separated by a period
