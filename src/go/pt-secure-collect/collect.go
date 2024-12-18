@@ -3,7 +3,6 @@ package main
 import (
 	"archive/tar"
 	"compress/gzip"
-	"crypto/sha256"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -49,10 +48,14 @@ func collectData(opts *cliOptions) error {
 	}
 
 	if !*opts.NoEncrypt && *opts.EncryptPassword != "" {
-		password := sha256.Sum256([]byte(*opts.EncryptPassword))
+		key, err := deriveKey(*opts.EncryptPassword)
+		if err != nil {
+			return errors.WithStack(err)
+		}
+
 		encryptedFile := tarFile + ".aes"
 		log.Infof("Encrypting %q file into %q", tarFile, encryptedFile)
-		encrypt(tarFile, encryptedFile, password)
+		encrypt(tarFile, encryptedFile, key)
 	}
 
 	return nil
