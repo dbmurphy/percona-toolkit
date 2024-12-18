@@ -15,8 +15,11 @@ import (
 )
 
 var (
+	// hkdfInfo used as the context info for HKDF.
 	hkdfInfo = []byte("Percona Toolkit")
-	salt     = [256]byte{
+
+	// salt is a random 256-byte array used as a salt for HKDF.
+	salt = [256]byte{
 		0x33, 0xc5, 0xc5, 0x5f, 0x3e, 0x81, 0xf6, 0x8d, 0x51, 0xd8, 0x18, 0xb9, 0xb7, 0x09, 0x70, 0x51,
 		0xc3, 0x60, 0x66, 0xef, 0xd4, 0x97, 0x2e, 0xdf, 0x11, 0x59, 0x34, 0x94, 0x47, 0xab, 0xd4, 0x44,
 		0xac, 0x2e, 0x89, 0x81, 0x85, 0xd5, 0x83, 0xbd, 0x2d, 0xb5, 0x43, 0xdd, 0xd7, 0x6c, 0x1b, 0xa7,
@@ -36,11 +39,21 @@ var (
 	}
 )
 
-func encryptorCmd(opts *cliOptions) (err error) {
-	hkdf := hkdf.New(sha256.New, []byte(*opts.EncryptPassword), salt[:], hkdfInfo)
+// deriveKey derives a cryptographically strong key from password.
+func deriveKey(password string) ([]byte, error) {
+	hkdf := hkdf.New(sha256.New, []byte(password), salt[:], hkdfInfo)
 	key := make([]byte, 32)
 	if _, err := io.ReadFull(hkdf, key); err != nil {
-		return errors.Wrap(err, "Cannot derive key from password")
+		return nil, errors.Wrap(err, "Cannot derive key from password")
+	}
+
+	return key, nil
+}
+
+func encryptorCmd(opts *cliOptions) (err error) {
+	key, err := deriveKey(*opts.EncryptPassword)
+	if err != nil {
+		return errors.WithStack(err)
 	}
 
 	switch opts.Command {
