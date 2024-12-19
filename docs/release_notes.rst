@@ -12,7 +12,7 @@ New Feature
 Improvements
 ------------------------------------------------------------
 
-* :jirabug:`PT-2347`: Improper use of sha256 hash algorithm in percona-toolkit/src/go/pt-secure-collect /encrypt.go. Note that this improvement is an incompatible change. pt-secure-collect now uses KDF to encrypt and decrypt user passwords. As a result, pt-secure-collect v3.7.0 cannot decrypt data collected by earlier versions and vice versa.
+* :jirabug:`PT-2347`: Improper use of sha256 hash algorithm in percona-toolkit/src/go/pt-secure-collect /encrypt.go. Note that this improvement is an **incompatible change**. pt-secure-collect now uses KDF to encrypt and decrypt user passwords. As a result, pt-secure-collect v3.7.0 cannot decrypt data collected by earlier versions and vice versa.
 * `PR-862`: Fixed flaky tests (Thanks to Henning Pöttker for the contribution)
 * `PR-839`: Update pt-mysql-summary (Thanks to GOKUL S for the contribution)
 
