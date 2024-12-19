@@ -1,6 +1,6 @@
 Changelog for Percona Toolkit
 
-v3.7.0 released 2024-12-25
+v3.7.0 released 2024-12-23
 
 * Feature PT-2340: Support MySQL 8.4
 * Improvement PT-2347: Improper use of sha256 hash algorithm in percona-toolkit/src/go/pt-secure-collect /encrypt.go
