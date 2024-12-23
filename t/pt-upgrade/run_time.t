@@ -60,7 +60,7 @@ my $t = time - $t0;
 
 ok(
    $t >= 3 && $t <= ($ENV{PERCONA_SLOW_BOX} ? 8 : 6),
-   "Exec queries: ran for roughly --run-time seconds"
+   "Exec queries: ran for roughly 3 seconds"
 ) or diag($output, 'Actual run time:', $t);
 
 # Exit status 8 = --run-time expired (an no other errors/problems)

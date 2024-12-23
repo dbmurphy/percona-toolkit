@@ -61,7 +61,7 @@ is(
 REPLACE INTO `issue_375`.`t`(`id`, `updated_at`, `foo`) VALUES ('100', '2009-09-06 15:01:23', 'cv');
 ",
    'Simple --replicate'
-);
+) or diag($output);
 
 # Note how the columns are out of order (tbl order is: id, updated_at, foo).
 # This is issue http://code.google.com/p/maatkit/issues/detail?id=371

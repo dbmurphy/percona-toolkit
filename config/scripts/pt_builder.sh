@@ -165,7 +165,7 @@ install_go() {
     #rm -rf /usr/local/go /usr/local/go1.8 /usr/local/go1.9
     #mv go1.9 /usr/local/
     #ln -s /usr/local/go1.9 /usr/local/go
-    GO_VERSION=1.22.4
+    GO_VERSION=1.23.4
     if [ x"$ARCH" = "xx86_64" ]; then
       GO_ARCH="amd64"
     elif [ x"$ARCH" = "xaarch64" ]; then
@@ -398,7 +398,7 @@ build_rpm(){
     ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
     echo "RHEL=${RHEL}" >> percona-toolkit.properties
     echo "ARCH=${ARCH}" >> percona-toolkit.properties
-    rpmbuild --target=x86_64 --define "version $VERSION" --define "VERSION $VERSION" --define "dist .el${RHEL}" --define "release $RPM_RELEASE.el${RHEL}" --define "_topdir ${WORKDIR}/rpmbuild" --rebuild rpmbuild/SRPMS/${SRC_RPM}
+    rpmbuild --target=${ARCH} --define "version $VERSION" --define "VERSION $VERSION" --define "dist .el${RHEL}" --define "release $RPM_RELEASE.el${RHEL}" --define "_topdir ${WORKDIR}/rpmbuild" --rebuild rpmbuild/SRPMS/${SRC_RPM}
 
     return_code=$?
     if [ $return_code != 0 ]; then

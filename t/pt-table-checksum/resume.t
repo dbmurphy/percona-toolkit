@@ -127,7 +127,7 @@ is_deeply(
       [qw( sakila city          )],
    ],
    "Checksum results for 1/4 of sakila singles"
-);
+) or diag(Dumper($row));
 
 $output = output(
    sub { pt_table_checksum::main(@args, qw(-d sakila --resume --chunk-size 10000)) },
