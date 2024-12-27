@@ -340,6 +340,85 @@ SKIP: {
 };
 
 # #############################################################################
+# PT-2375: pt-table-sync must handle generated columns correctly
+# #############################################################################
+$row = {
+   id  => 1,
+   foo => 'foo',
+   bar => 'bar',
+};
+$tbl_struct = {
+   col_posn => { id=>0, foo=>1, bar=>2 },
+   is_generated => {foo=>1}
+};
+$ch = new ChangeHandler(
+   Quoter     => $q,
+   right_db   => 'test',       # dst
+   right_tbl  => 'pt-2375',
+   left_db    => 'test',       # src
+   left_tbl   => 'pt-2375',
+   actions    => [ sub { push @rows, @_ } ],
+   replace    => 0,
+   queue      => 0,
+   tbl_struct => $tbl_struct,
+);
+
+@rows = ();
+@dbhs = ();
+
+is(
+   $ch->make_INSERT($row, [qw(id foo bar)]),
+   "INSERT INTO `test`.`pt-2375`(`id`, `bar`) VALUES ('1', 'bar')",
+   'make_INSERT() omits generated columns'
+);
+
+is(
+   $ch->make_REPLACE($row, [qw(id foo bar)]),
+   "REPLACE INTO `test`.`pt-2375`(`id`, `bar`) VALUES ('1', 'bar')",
+   'make_REPLACE() omits generated columns'
+);
+
+is(
+   $ch->make_UPDATE($row, [qw(id foo)]),
+   "UPDATE `test`.`pt-2375` SET `bar`='bar' WHERE `id`='1' AND `foo`='foo' LIMIT 1",
+   'make_UPDATE() omits generated columns from SET phrase but includes in WHERE phrase'
+);
+
+is(
+   $ch->make_DELETE($row, [qw(id foo bar)]),
+   "DELETE FROM `test`.`pt-2375` WHERE `id`='1' AND `foo`='foo' AND `bar`='bar' LIMIT 1",
+   'make_DELETE() includes generated columns in WHERE phrase'
+);
+
+SKIP: {
+   skip 'Cannot connect to sandbox master', 3 unless $master_dbh;
+
+   $master_dbh->do('DROP TABLE IF EXISTS test.`pt-2375`');
+   $master_dbh->do('CREATE TABLE test.`pt-2375` (id INT, foo varchar(16) as ("foo"), bar char)');
+   $master_dbh->do("INSERT INTO test.`pt-2375` (`id`, `bar`) VALUES (1,'a'),(2,'b')");
+
+   $ch->fetch_back($master_dbh);
+
+   is(
+      $ch->make_INSERT($row, [qw(id foo)]),
+      "INSERT INTO `test`.`pt-2375`(`id`, `bar`) VALUES ('1', 'a')",
+      'make_INSERT() omits generated columns, with fetch-back'
+   );
+
+   is(
+      $ch->make_REPLACE($row, [qw(id foo)]),
+      "REPLACE INTO `test`.`pt-2375`(`id`, `bar`) VALUES ('1', 'a')",
+      'make_REPLACE() omits generated columns, with fetch-back'
+   );
+
+   is(
+      $ch->make_UPDATE($row, [qw(id foo)]),
+      "UPDATE `test`.`pt-2375` SET `bar`='a' WHERE `id`='1' AND `foo`='foo' LIMIT 1",
+      'make_UPDATE() omits generated columns from SET phrase, with fetch-back'
+   );
+};
+
+# #############################################################################
 # Issue 641: Make mk-table-sync use hex for binary/blob data
 # #############################################################################
 $tbl_struct = {
