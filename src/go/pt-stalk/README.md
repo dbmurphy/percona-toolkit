@@ -70,6 +70,17 @@ Example plugin script (plugin.sh):
     echo "Custom collection started" > "$PT_DEST/${PT_PREFIX}_custom.txt"
     # Add your custom collection logic here
 
+### Basic MongoDB Monitoring
+
+Collect MongoDB metrics:
+
+    pt-stalk --collectors=mongodb \
+      --mongodb-host=localhost \
+      --mongodb-user=myuser \
+      --mongodb-password=secret \
+      --dest=/var/log/mongodb/samples \
+      --interval=1
+
 ## Configuration Options
 
 ### Common Options
@@ -106,6 +117,12 @@ Example plugin script (plugin.sh):
 - --notify-by-email: Email address for notifications
 - --verbose: Verbosity level (0-3) (default: 2)
 
+### MongoDB Collector Options
+- --mongodb-host: MongoDB host (default: localhost)
+- --mongodb-port: MongoDB port (default: 27017)
+- --mongodb-user: MongoDB user
+- --mongodb-password: MongoDB password
+
 ## Output Files
 
 Each collection creates files with the specified prefix and timestamps:
@@ -116,3 +133,6 @@ Each collection creates files with the specified prefix and timestamps:
 - {prefix}_meminfo.txt: System memory information
 - {prefix}_loadavg.txt: System load average
 - {prefix}_plugin.txt: Custom plugin output (if configured)
+- {prefix}_server_status.txt: MongoDB server status metrics
+- {prefix}_current_op.txt: MongoDB currently running operations
+- {prefix}_db_stats.txt: MongoDB database statistics
